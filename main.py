@@ -1,24 +1,41 @@
+import os
 import math
 import pygame
 
+pygame.init()
+
+
 sign = lambda x: math.copysign(1, x)
 
-pygame.init()
+player = pygame.image.load(os.path.join("assets", "player.png"))
+bg = pygame.image.load(os.path.join("assets", "bg.png"))
+
 
 win = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("AP Project")
 
-x, y = 250, 250
-height, width = 60, 40
-vel = 5
-fps = 30
+x, y = 250 - 32, 500 - 64
+height, width = 64, 64
+vel = 24
+fps = 60
 
 is_jump = False
 jump_count = 10
+walk_count = 0
+
+
+def draw_window():
+    global walk_count
+
+    win.blit(bg, (0, 0))
+    win.blit(player, (x, y))
+    # pygame.draw.rect(win, (255, 20, 20), (x, y, width, height))
+    pygame.display.update()
+
 
 run = True
 while run:
-    pygame.time.delay(int((10 ** 3) / fps))
+    pygame.time.delay((10 ** 3) // fps)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -48,8 +65,7 @@ while run:
 
     x = max(0, min(x, 500 - width))
     y = max(0, min(y, 500 - height))
-    win.fill((0, 0, 0))
-    pygame.draw.rect(win, (255, 20, 20), (x, y, width, height))
-    pygame.display.update()
+
+    draw_window()
 
 pygame.quit()
