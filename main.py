@@ -9,7 +9,7 @@ def get_init_variables():
 
     variables = dict(
         res=res,  # game window size
-        fps=80,  # game frame rate
+        fps=60,  # game frame rate
         player_size=player_size,  # size of the player character
         player_loc=dict(
             x=(res[0] - player_size["w"]) // 2, y=res[1] + player_size["h"] + 5
@@ -30,21 +30,18 @@ class Player:
         self.size = size
         self.vel = 24
         self.image = image
-        self.left = False
-        self.right = False
 
     def draw(self, win):
         win.blit(self.image, (self.loc["x"], self.loc["y"]))
 
 
-class projectile(object):
-    def __init__(self, x, y, radius, color, facing):
+class Projectile:
+    def __init__(self, x, y, radius, color):
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
-        self.facing = facing
-        self.vel = 8 * facing
+        self.vel = 10
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
@@ -70,7 +67,7 @@ def main_loop(
     loc = 0
     bullets_left = []
     bullets_right = []
-    num_of_bullets = 900
+    num_of_bullets = resolution[1]
     while run:
         clock.tick(fps)
 
@@ -80,8 +77,8 @@ def main_loop(
 
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             if bullet_r.y < num_of_bullets and bullet_r.y > 0:
-                bullet_r.y += bullet_r.vel
-                bullet_l.y += bullet_l.vel
+                bullet_r.y -= bullet_r.vel
+                bullet_l.y -= bullet_l.vel
             else:
                 bullets_right.pop(bullets_right.index(bullet_r))
                 bullets_left.pop(bullets_left.index(bullet_l))
@@ -89,30 +86,22 @@ def main_loop(
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player.loc["x"] -= player.vel
-            player.left = True
-            player.right = False
         if keys[pygame.K_RIGHT]:
             player.loc["x"] += player.vel
-            player.right = True
-            player.left = False
 
         if keys[pygame.K_UP]:
             player.loc["y"] -= player.vel
-            player.right = False
-            player.left = False
         if keys[pygame.K_DOWN]:
             player.loc["y"] += player.vel
-            player.right = False
-            player.left = False
 
         if keys[pygame.K_SPACE]:
             if len(bullets_right) < 5:
-                bullets_right.append(projectile(
+                bullets_right.append(Projectile(
                     round(player.loc["x"] + 3.4*player.size["w"]//4),
-                    round(player.loc["y"] + player.size["h"]//3), 6, (200, 0, 0), -1))
-                bullets_left.append(projectile(
+                    round(player.loc["y"] + player.size["h"]//3), 6, (200, 0, 0)))
+                bullets_left.append(Projectile(
                     round(player.loc["x"] + 0.6*player.size["w"]//4),
-                    round(player.loc["y"] + player.size["h"]//3), 6, (200, 0, 0), -1))
+                    round(player.loc["y"] + player.size["h"]//3), 6, (200, 0, 0)))
 
         player.loc["x"] = max(
             0, min(player.loc["x"], resolution[0] - player.size["w"]))
