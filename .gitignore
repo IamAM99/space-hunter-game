@@ -1,6 +1,10 @@
 __pycache__/
 
 # Environments
+ap/
+.ap
+.vscode
+.vscode/
 .env
 .venv
 env/
