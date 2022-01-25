@@ -39,6 +39,14 @@ class Player:
     def _get_hitbox(self):
         return (self.loc["x"], self.loc["y"], self.size["w"], self.size["h"])
 
+    def collided(self, other) -> bool:
+        x1, y1, w1, h1 = self.hitbox
+        x2, y2, w2, h2 = other.hitbox
+        if (x1 < x2 + w2) and (x1 + w1 > x2) and (y1 < y2 + h2) and (y1 + h1 > y2):
+            return True
+        else:
+            return False
+
     def draw(self, win):
         self.hitbox = self._get_hitbox()  # update hitbox
 
@@ -123,6 +131,9 @@ def main_loop(
                 print("enemy out of screen")
             enemy.draw(win)
             enemy.move(bg_vel)
+
+            if player.collided(enemy):
+                print("collided")
         pygame.display.update()
 
         loop_cnt += 1
