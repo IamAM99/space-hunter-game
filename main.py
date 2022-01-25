@@ -9,16 +9,9 @@ from objects.projectile import Projectile
 
 def get_init_variables():
     """Get the initial variables"""
-    res = (900, 600)
-    player_size = dict(w=56, h=57)
-
     variables = dict(
-        res=res,  # game window size
+        res=(900, 600),  # game window size
         fps=60,  # game frame rate
-        player_size=player_size,  # size of the player character
-        player_loc=dict(
-            x=(res[0] - player_size["w"]) // 2, y=res[1] + player_size["h"] + 5
-        ),  # initial location of the player
         bg_vel=1,  # velocity of background movement
     )
     return variables
@@ -43,15 +36,14 @@ def main_loop(
     clock,
     bg_image,
     bg_vel,
-    player_loc,
-    player_size,
     player_image,
+    enemy_image,
     bullet_image,
     fps,
     resolution,
 ):
     bg_loc = 0
-    player = Player(loc=player_loc, image=player_image)
+    player = Player(resolution=resolution, image=player_image)
     enemies = deque()
     loop_cnt = 0  # count while loop iterations
     bullets_left = []
@@ -160,11 +152,10 @@ if __name__ == "__main__":
         run=True,
         win=win,
         clock=clock,
-        bg_image=bg_image,
         bg_vel=var["bg_vel"],
+        bg_image=bg_image,
         player_image=player_image,
-        player_loc=var["player_loc"],
-        player_size=var["player_size"],
+        enemy_image=enemy_image,
         bullet_image=bullet_image,
         fps=var["fps"],
         resolution=var["res"],
