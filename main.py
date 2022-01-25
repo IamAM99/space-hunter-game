@@ -32,7 +32,7 @@ class Player:
     def __init__(self, loc, size, image) -> None:
         self.loc = loc
         self.size = size
-        self.vel = 24
+        self.vel = 10
         self.image = image
         self.hitbox = self._get_hitbox()  # (x, y, width, height)
 
@@ -68,7 +68,7 @@ class Projectile:
         self.y = y
         self.radius = radius
         self.color = color
-        self.vel = 10
+        self.vel = 15
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
@@ -141,7 +141,7 @@ def main_loop(
             player.loc["y"] += player.vel
 
         if keys[pygame.K_SPACE]:
-            if len(bullets_right) < 5:
+            if loop_cnt % 10 < 2:
                 bullets_right.append(
                     Projectile(
                         round(player.loc["x"] + 3.4 * player.size["w"] // 4),
