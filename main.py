@@ -50,7 +50,8 @@ class Player:
     def draw(self, win):
         self.hitbox = self._get_hitbox()  # update hitbox
 
-        win.blit(self.image, (self.loc["x"], self.loc["y"]))  # draw the character
+        # draw the character
+        win.blit(self.image, (self.loc["x"], self.loc["y"]))
         # pygame.draw.rect(win, (255, 255, 255), self.hitbox, 2)  # draw the hitbox
 
 
@@ -91,12 +92,15 @@ def main_loop(
     player_image,
     fps,
     resolution,
+    bullet_sound,
 ):
     bg_loc = 0
+    font = pygame.font.SysFont("comicsans", 30, True)
     player = Player(loc=player_loc, size=player_size, image=player_image)
     enemies = deque()
     loop_cnt = 0  # count while loop iterations
     loc = 0
+    score = 0
     bullets_left = []
     bullets_right = []
     num_of_bullets = resolution[1]
@@ -143,9 +147,10 @@ def main_loop(
 
         if keys[pygame.K_SPACE]:
             if loop_cnt % 10 < 2:
+                bullet_sound.play()
                 bullets_right.append(
                     Projectile(
-                        round(player.loc["x"] + 3.4 * player.size["w"] // 4),
+                        round(player.loc["x"] + 3.5 * player.size["w"] // 4),
                         round(player.loc["y"] + player.size["h"] // 3),
                         6,
                         (200, 0, 0),
@@ -153,7 +158,7 @@ def main_loop(
                 )
                 bullets_left.append(
                     Projectile(
-                        round(player.loc["x"] + 0.6 * player.size["w"] // 4),
+                        round(player.loc["x"] + 0.5 * player.size["w"] // 4),
                         round(player.loc["y"] + player.size["h"] // 3),
                         6,
                         (200, 0, 0),
@@ -180,7 +185,10 @@ def main_loop(
             enemy.move()
 
             if player.collided(enemy):
+                score += 1
                 print("collided")
+        text = font.render("Score: " + str(score), 1, (8, 227, 14))
+        win.blit(text, (10, 10))
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             bullet_l.draw(win)
             bullet_r.draw(win)
@@ -199,6 +207,13 @@ if __name__ == "__main__":
     pygame.display.set_caption("Space")
 
     pygame.init()
+
+    # music
+    bullet_sound = pygame.mixer.Sound(os.path.join("assets", "bullet.mp3"))
+    hit_sound = pygame.mixer.Sound(os.path.join("assets", "hit.mp3"))
+    music = pygame.mixer.music.load(os.path.join("assets", "music.mp3"))
+    pygame.mixer.music.play(-1)
+
     main_loop(
         run=True,
         win=win,
@@ -210,5 +225,6 @@ if __name__ == "__main__":
         player_size=var["player_size"],
         fps=var["fps"],
         resolution=var["res"],
+        bullet_sound=bullet_sound,
     )
     pygame.quit()
