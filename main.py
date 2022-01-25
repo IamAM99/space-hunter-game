@@ -4,7 +4,7 @@ import pygame
 
 def get_init_variables():
     """Get the initial variables"""
-    res = (500, 500)
+    res = (900, 600)
     player_size = dict(w=64, h=64)
 
     variables = dict(
@@ -35,9 +35,9 @@ class Player:
         win.blit(self.image, (self.loc["x"], self.loc["y"]))
 
 
-def draw_window(bg_image, loc):
+def draw_window(bg_image, loc, resolution):
     win.blit(bg_image, (0, loc))
-    win.blit(bg_image, (0, loc - 500))
+    win.blit(bg_image, (0, loc - resolution[1]))
 
 
 def main_loop(
@@ -75,10 +75,10 @@ def main_loop(
         player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
 
         # draw
-        loc += 5
-        if loc > 500:
+        loc += 2
+        if loc > resolution[1]:
             loc = 0
-        draw_window(bg_image, loc)
+        draw_window(bg_image, loc, resolution)
         player.draw(win)
         pygame.display.update()
 
