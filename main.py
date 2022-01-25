@@ -1,5 +1,7 @@
 import os
+import random
 import pygame
+from collections import deque
 
 
 def get_init_variables():
@@ -14,7 +16,7 @@ def get_init_variables():
         player_loc=dict(
             x=(res[0] - player_size["w"]) // 2, y=res[1] + player_size["h"] + 5
         ),  # initial location of the player
-        bg_vel=2,  # velocity of background movement
+        bg_vel=1,  # velocity of background movement
     )
     return variables
 
@@ -22,7 +24,8 @@ def get_init_variables():
 def get_images():
     bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
     player_image = pygame.image.load(os.path.join("assets", "player.png"))
-    return bg_image, player_image
+    enemy_image = pygame.image.load(os.path.join("assets", "enemy.png"))
+    return bg_image, player_image, enemy_image
 
 
 class Player:
@@ -40,8 +43,8 @@ class Enemy(Player):
     def __init__(self, loc, size, image) -> None:
         super().__init__(loc, size, image)
 
-    def move(self):
-        pass
+    def move(self, vel):
+        self.loc["y"] += vel
 
 
 def draw_window(bg_image, loc, resolution):
@@ -61,14 +64,31 @@ def main_loop(
     fps,
     resolution,
 ):
-    player = Player(loc=player_loc, size=player_size, image=player_image)
     bg_loc = 0
+    player = Player(loc=player_loc, size=player_size, image=player_image)
+    enemies = deque()
+    loop_cnt = 0  # count while loop iterations
+
     while run:
         clock.tick(fps)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        # print(loop_cnt)
+        # create a new enemy
+        if loop_cnt == fps:  # try to add enemy every second
+            if random.getrandbits(1):
+                print("enemy created")
+                enemies.append(
+                    Enemy(
+                        loc=dict(x=random.random() * (resolution[0] - 64), y=0),
+                        size=dict(w=64, h=54),
+                        image=enemy_image,
+                    )
+                )
+            loop_cnt = 0
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -90,14 +110,22 @@ def main_loop(
             bg_loc = 0
         draw_window(bg_image, bg_loc, resolution)
         player.draw(win)
+        for enemy in list(enemies):
+            if enemy.loc["y"] > resolution[1]:
+                enemies.popleft()
+                print("enemy out of screen")
+            enemy.draw(win)
+            enemy.move(bg_vel)
         pygame.display.update()
+
+        loop_cnt += 1
 
 
 if __name__ == "__main__":
     var = get_init_variables()
     clock = pygame.time.Clock()
 
-    bg_image, player_image = get_images()
+    bg_image, player_image, enemy_image = get_images()
 
     win = pygame.display.set_mode(var["res"])
     pygame.display.set_caption("Space")
