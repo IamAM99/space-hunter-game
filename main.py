@@ -32,7 +32,7 @@ class Player:
     def __init__(self, loc, size, image) -> None:
         self.loc = loc
         self.size = size
-        self.vel = 10
+        self.vel = 8
         self.image = image
         self.hitbox = self._get_hitbox()  # (x, y, width, height)
 
@@ -57,9 +57,10 @@ class Player:
 class Enemy(Player):
     def __init__(self, loc, size, image) -> None:
         super().__init__(loc, size, image)
+        self.vel = 4
 
-    def move(self, vel):
-        self.loc["y"] += vel
+    def move(self):
+        self.loc["y"] += self.vel
 
 
 class Projectile:
@@ -160,7 +161,10 @@ def main_loop(
                 )
 
         player.loc["x"] = max(0, min(player.loc["x"], resolution[0] - player.size["w"]))
-        player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
+        player.loc["y"] = max(
+            (resolution[1] - player.size["h"]) // 1.4,
+            min(player.loc["y"], resolution[1] - player.size["h"]),
+        )
 
         # draw
         bg_loc += bg_vel
@@ -173,7 +177,7 @@ def main_loop(
                 enemies.popleft()
                 print("enemy out of screen")
             enemy.draw(win)
-            enemy.move(bg_vel)
+            enemy.move()
 
             if player.collided(enemy):
                 print("collided")
