@@ -62,6 +62,18 @@ class Enemy(Player):
         self.loc["y"] += vel
 
 
+class Projectile:
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.vel = 10
+
+    def draw(self, win):
+        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+
+
 def draw_window(bg_image, loc, resolution):
     win.blit(bg_image, (0, loc))
     win.blit(bg_image, (0, loc - resolution[1]))
@@ -83,6 +95,10 @@ def main_loop(
     player = Player(loc=player_loc, size=player_size, image=player_image)
     enemies = deque()
     loop_cnt = 0  # count while loop iterations
+    loc = 0
+    bullets_left = []
+    bullets_right = []
+    num_of_bullets = resolution[1]
 
     while run:
         clock.tick(fps)
@@ -105,6 +121,14 @@ def main_loop(
                 )
             loop_cnt = 0
 
+        for bullet_r, bullet_l in zip(bullets_right, bullets_left):
+            if bullet_r.y < num_of_bullets and bullet_r.y > 0:
+                bullet_r.y -= bullet_r.vel
+                bullet_l.y -= bullet_l.vel
+            else:
+                bullets_right.pop(bullets_right.index(bullet_r))
+                bullets_left.pop(bullets_left.index(bullet_l))
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player.loc["x"] -= player.vel
@@ -115,6 +139,25 @@ def main_loop(
             player.loc["y"] -= player.vel
         if keys[pygame.K_DOWN]:
             player.loc["y"] += player.vel
+
+        if keys[pygame.K_SPACE]:
+            if len(bullets_right) < 5:
+                bullets_right.append(
+                    Projectile(
+                        round(player.loc["x"] + 3.4 * player.size["w"] // 4),
+                        round(player.loc["y"] + player.size["h"] // 3),
+                        6,
+                        (200, 0, 0),
+                    )
+                )
+                bullets_left.append(
+                    Projectile(
+                        round(player.loc["x"] + 0.6 * player.size["w"] // 4),
+                        round(player.loc["y"] + player.size["h"] // 3),
+                        6,
+                        (200, 0, 0),
+                    )
+                )
 
         player.loc["x"] = max(0, min(player.loc["x"], resolution[0] - player.size["w"]))
         player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
@@ -134,6 +177,9 @@ def main_loop(
 
             if player.collided(enemy):
                 print("collided")
+        for bullet_r, bullet_l in zip(bullets_right, bullets_left):
+            bullet_l.draw(win)
+            bullet_r.draw(win)
         pygame.display.update()
 
         loop_cnt += 1
