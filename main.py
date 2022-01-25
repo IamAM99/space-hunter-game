@@ -56,7 +56,6 @@ def main_loop(
             if event.type == pygame.QUIT:
                 run = False
 
-        # print(loop_cnt)
         # create a new enemy
         if loop_cnt == fps:  # try to add enemy every second
             if random.getrandbits(1):
@@ -71,39 +70,18 @@ def main_loop(
 
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             if bullet_r.loc["y"] > -bullet_r.size["h"]:
-                bullet_r.loc["y"] -= bullet_r.vel
-                bullet_l.loc["y"] -= bullet_l.vel
+                bullet_r.move()
+                bullet_l.move()
             else:
                 bullets_right.pop(bullets_right.index(bullet_r))
                 bullets_left.pop(bullets_left.index(bullet_l))
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player.loc["x"] -= player.vel
-        if keys[pygame.K_RIGHT]:
-            player.loc["x"] += player.vel
-
-        if keys[pygame.K_UP]:
-            player.loc["y"] -= player.vel
-        if keys[pygame.K_DOWN]:
-            player.loc["y"] += player.vel
+        player.move(keys)
 
         if keys[pygame.K_SPACE]:
             if loop_cnt % 10 < 2:
-                bullets_right.append(
-                    Projectile(
-                        player=player,
-                        side="right",
-                        image=bullet_image,
-                    )
-                )
-                bullets_left.append(
-                    Projectile(
-                        player=player,
-                        side="left",
-                        image=bullet_image,
-                    )
-                )
+                player.shoot(bullets_right, bullets_left, bullet_image)
 
         player.loc["x"] = max(0, min(player.loc["x"], resolution[0] - player.size["w"]))
         player.loc["y"] = max(
