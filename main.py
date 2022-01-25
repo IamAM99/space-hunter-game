@@ -2,6 +2,9 @@ import os
 import random
 import pygame
 from collections import deque
+from objects.enemy import Enemy
+from objects.player import Player
+from objects.projectile import Projectile
 
 
 def get_init_variables():
@@ -25,54 +28,8 @@ def get_images():
     bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
     player_image = pygame.image.load(os.path.join("assets", "player.png"))
     enemy_image = pygame.image.load(os.path.join("assets", "enemy.png"))
-    return bg_image, player_image, enemy_image
-
-
-class Player:
-    def __init__(self, loc, size, image) -> None:
-        self.loc = loc
-        self.size = size
-        self.vel = 8
-        self.image = image
-        self.hitbox = self._get_hitbox()  # (x, y, width, height)
-
-    def _get_hitbox(self):
-        return (self.loc["x"], self.loc["y"], self.size["w"], self.size["h"])
-
-    def collided(self, other) -> bool:
-        x1, y1, w1, h1 = self.hitbox
-        x2, y2, w2, h2 = other.hitbox
-        if (x1 < x2 + w2) and (x1 + w1 > x2) and (y1 < y2 + h2) and (y1 + h1 > y2):
-            return True
-        else:
-            return False
-
-    def draw(self, win):
-        self.hitbox = self._get_hitbox()  # update hitbox
-
-        win.blit(self.image, (self.loc["x"], self.loc["y"]))  # draw the character
-        # pygame.draw.rect(win, (255, 255, 255), self.hitbox, 2)  # draw the hitbox
-
-
-class Enemy(Player):
-    def __init__(self, loc, size, image) -> None:
-        super().__init__(loc, size, image)
-        self.vel = 4
-
-    def move(self):
-        self.loc["y"] += self.vel
-
-
-class Projectile:
-    def __init__(self, x, y, radius, color):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.color = color
-        self.vel = 15
-
-    def draw(self, win):
-        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+    bullet_image = pygame.image.load(os.path.join("assets", "bullet.png"))
+    return bg_image, player_image, enemy_image, bullet_image
 
 
 def draw_window(bg_image, loc, resolution):
@@ -89,17 +46,16 @@ def main_loop(
     player_loc,
     player_size,
     player_image,
+    bullet_image,
     fps,
     resolution,
 ):
     bg_loc = 0
-    player = Player(loc=player_loc, size=player_size, image=player_image)
+    player = Player(loc=player_loc, image=player_image)
     enemies = deque()
     loop_cnt = 0  # count while loop iterations
-    loc = 0
     bullets_left = []
     bullets_right = []
-    num_of_bullets = resolution[1]
 
     while run:
         clock.tick(fps)
@@ -116,16 +72,15 @@ def main_loop(
                 enemies.append(
                     Enemy(
                         loc=dict(x=random.random() * (resolution[0] - 64), y=-38),
-                        size=dict(w=64, h=38),
                         image=enemy_image,
                     )
                 )
             loop_cnt = 0
 
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
-            if bullet_r.y < num_of_bullets and bullet_r.y > 0:
-                bullet_r.y -= bullet_r.vel
-                bullet_l.y -= bullet_l.vel
+            if bullet_r.loc["y"] > -bullet_r.size["h"]:
+                bullet_r.loc["y"] -= bullet_r.vel
+                bullet_l.loc["y"] -= bullet_l.vel
             else:
                 bullets_right.pop(bullets_right.index(bullet_r))
                 bullets_left.pop(bullets_left.index(bullet_l))
@@ -145,18 +100,16 @@ def main_loop(
             if loop_cnt % 10 < 2:
                 bullets_right.append(
                     Projectile(
-                        round(player.loc["x"] + 3.4 * player.size["w"] // 4),
-                        round(player.loc["y"] + player.size["h"] // 3),
-                        6,
-                        (200, 0, 0),
+                        player=player,
+                        side="right",
+                        image=bullet_image,
                     )
                 )
                 bullets_left.append(
                     Projectile(
-                        round(player.loc["x"] + 0.6 * player.size["w"] // 4),
-                        round(player.loc["y"] + player.size["h"] // 3),
-                        6,
-                        (200, 0, 0),
+                        player=player,
+                        side="left",
+                        image=bullet_image,
                     )
                 )
 
@@ -171,7 +124,7 @@ def main_loop(
         if bg_loc > resolution[1]:
             bg_loc = 0
         draw_window(bg_image, bg_loc, resolution)
-        player.draw(win)
+
         for enemy in list(enemies):
             if enemy.loc["y"] > resolution[1]:
                 enemies.popleft()
@@ -181,9 +134,13 @@ def main_loop(
 
             if player.collided(enemy):
                 print("collided")
+
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             bullet_l.draw(win)
             bullet_r.draw(win)
+
+        player.draw(win)
+
         pygame.display.update()
 
         loop_cnt += 1
@@ -193,7 +150,7 @@ if __name__ == "__main__":
     var = get_init_variables()
     clock = pygame.time.Clock()
 
-    bg_image, player_image, enemy_image = get_images()
+    bg_image, player_image, enemy_image, bullet_image = get_images()
 
     win = pygame.display.set_mode(var["res"])
     pygame.display.set_caption("Space")
@@ -208,6 +165,7 @@ if __name__ == "__main__":
         player_image=player_image,
         player_loc=var["player_loc"],
         player_size=var["player_size"],
+        bullet_image=bullet_image,
         fps=var["fps"],
         resolution=var["res"],
     )
