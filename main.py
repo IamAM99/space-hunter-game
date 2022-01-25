@@ -1,11 +1,5 @@
 import os
-import math
 import pygame
-
-
-def sign(x):
-    """Sign function"""
-    return math.copysign(1, x)
 
 
 def get_init_variables():
@@ -39,11 +33,11 @@ class Player:
 
     def draw(self, win):
         win.blit(self.image, (self.loc["x"], self.loc["y"]))
-        pygame.display.update()
 
 
-def draw_window(bg_image):
-    win.blit(bg_image, (0, 0))
+def draw_window(bg_image, loc):
+    win.blit(bg_image, (0, loc))
+    win.blit(bg_image, (0, loc - 500))
 
 
 def main_loop(
@@ -58,7 +52,7 @@ def main_loop(
     resolution,
 ):
     player = Player(loc=player_loc, size=player_size, image=player_image)
-
+    loc = 0
     while run:
         clock.tick(fps)
 
@@ -81,8 +75,12 @@ def main_loop(
         player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
 
         # draw
-        draw_window(bg_image)
+        loc += 5
+        if loc > 500:
+            loc = 0
+        draw_window(bg_image, loc)
         player.draw(win)
+        pygame.display.update()
 
 
 if __name__ == "__main__":
