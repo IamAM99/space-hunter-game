@@ -2,25 +2,32 @@ import os
 import math
 import pygame
 
-## Globals
-RES = (500, 500)  # game window size
-FPS = 60  # game frame rate
-PLAYER_SIZE = dict(w=64, h=64)
-PLAYER_LOC = dict(x=(RES[0] - PLAYER_SIZE["w"]) // 2, y=RES[1] + PLAYER_SIZE["h"] + 5)
 
-pygame.init()
+def sign(x):
+    """Sign function"""
+    return math.copysign(1, x)
 
 
-sign = lambda x: math.copysign(1, x)
+def get_init_variables():
+    """Get the initial variables"""
+    res = (500, 500)
+    player_size = dict(w=64, h=64)
 
-player_image = pygame.image.load(os.path.join("assets", "player.png"))
-bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
+    variables = dict(
+        res=res,  # game window size
+        fps=60,  # game frame rate
+        player_size=player_size,  # size of the player character
+        player_loc=dict(
+            x=(res[0] - player_size["w"]) // 2, y=res[1] + player_size["h"] + 5
+        ),  # initial location of the player
+    )
+    return variables
 
 
-clock = pygame.time.Clock()
-
-win = pygame.display.set_mode(RES)
-pygame.display.set_caption("AP Project")
+def get_images():
+    bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
+    player_image = pygame.image.load(os.path.join("assets", "player.png"))
+    return bg_image, player_image
 
 
 class Player:
@@ -31,7 +38,7 @@ class Player:
         self.image = image
 
     def draw(self, win):
-        win.blit(self.image, (player.loc["x"], player.loc["y"]))
+        win.blit(self.image, (self.loc["x"], self.loc["y"]))
         pygame.display.update()
 
 
@@ -39,31 +46,64 @@ def draw_window(bg_image):
     win.blit(bg_image, (0, 0))
 
 
-player = Player(loc=PLAYER_LOC, size=PLAYER_SIZE, image=player_image)
-run = True
-while run:
-    clock.tick(FPS)
+def main_loop(
+    run: bool,
+    win,
+    clock,
+    bg_image,
+    player_loc,
+    player_size,
+    player_image,
+    fps,
+    resolution,
+):
+    player = Player(loc=player_loc, size=player_size, image=player_image)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+    while run:
+        clock.tick(fps)
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player.loc["x"] -= player.vel
-    if keys[pygame.K_RIGHT]:
-        player.loc["x"] += player.vel
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
-    if keys[pygame.K_UP]:
-        player.loc["y"] -= player.vel
-    if keys[pygame.K_DOWN]:
-        player.loc["y"] += player.vel
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            player.loc["x"] -= player.vel
+        if keys[pygame.K_RIGHT]:
+            player.loc["x"] += player.vel
 
-    player.loc["x"] = max(0, min(player.loc["x"], RES[0] - player.size["w"]))
-    player.loc["y"] = max(0, min(player.loc["y"], RES[1] - player.size["h"]))
+        if keys[pygame.K_UP]:
+            player.loc["y"] -= player.vel
+        if keys[pygame.K_DOWN]:
+            player.loc["y"] += player.vel
 
-    # draw
-    draw_window(bg_image)
-    player.draw(win)
+        player.loc["x"] = max(0, min(player.loc["x"], resolution[0] - player.size["w"]))
+        player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
 
-pygame.quit()
+        # draw
+        draw_window(bg_image)
+        player.draw(win)
+
+
+if __name__ == "__main__":
+    var = get_init_variables()
+    clock = pygame.time.Clock()
+
+    bg_image, player_image = get_images()
+
+    win = pygame.display.set_mode(var["res"])
+    pygame.display.set_caption("Space")
+
+    pygame.init()
+    main_loop(
+        run=True,
+        win=win,
+        clock=clock,
+        bg_image=bg_image,
+        player_image=player_image,
+        player_loc=var["player_loc"],
+        player_size=var["player_size"],
+        fps=var["fps"],
+        resolution=var["res"],
+    )
+    pygame.quit()
