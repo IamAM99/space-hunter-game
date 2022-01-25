@@ -2,40 +2,44 @@ import os
 import math
 import pygame
 
+## Globals
+RES = (500, 500)  # game window size
+FPS = 60  # game frame rate
+PLAYER_SIZE = dict(w=64, h=64)
+PLAYER_LOC = dict(x=(RES[0] - PLAYER_SIZE["w"]) // 2, y=RES[1] + PLAYER_SIZE["h"] + 5)
+
 pygame.init()
 
 
 sign = lambda x: math.copysign(1, x)
 
-player = pygame.image.load(os.path.join("assets", "player.png"))
-bg = pygame.image.load(os.path.join("assets", "bg.png"))
+player_image = pygame.image.load(os.path.join("assets", "player.png"))
+bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
 
 
-win = pygame.display.set_mode((500, 500))
+clock = pygame.time.Clock()
+
+win = pygame.display.set_mode(RES)
 pygame.display.set_caption("AP Project")
 
-x, y = 250 - 32, 500 - 64
-height, width = 64, 64
-vel = 24
-fps = 60
 
-is_jump = False
-jump_count = 10
-walk_count = 0
+class Player:
+    def __init__(self, loc, size) -> None:
+        self.loc = loc
+        self.size = size
+        self.vel = 24
 
 
-def draw_window():
-    global walk_count
-
-    win.blit(bg, (0, 0))
-    win.blit(player, (x, y))
-    # pygame.draw.rect(win, (255, 20, 20), (x, y, width, height))
+def draw_window(bg_image, player_image, player: Player):
+    win.blit(bg_image, (0, 0))
+    win.blit(player_image, (player.loc["x"], player.loc["y"]))
     pygame.display.update()
 
 
+player = Player(loc=PLAYER_LOC, size=PLAYER_SIZE)
 run = True
 while run:
-    pygame.time.delay((10 ** 3) // fps)
+    clock.tick(FPS)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -43,29 +47,18 @@ while run:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        x -= vel
-
+        player.loc["x"] -= player.vel
     if keys[pygame.K_RIGHT]:
-        x += vel
+        player.loc["x"] += player.vel
 
-    if not is_jump:
-        if keys[pygame.K_UP]:
-            y -= vel
-        if keys[pygame.K_DOWN]:
-            y += vel
-        if keys[pygame.K_SPACE]:
-            is_jump = True
-    else:
-        if jump_count >= -10:
-            y -= sign(jump_count) * (jump_count ** 2) * 0.4
-            jump_count -= 1
-        else:
-            is_jump = False
-            jump_count = 10
+    if keys[pygame.K_UP]:
+        player.loc["y"] -= player.vel
+    if keys[pygame.K_DOWN]:
+        player.loc["y"] += player.vel
 
-    x = max(0, min(x, 500 - width))
-    y = max(0, min(y, 500 - height))
+    player.loc["x"] = max(0, min(player.loc["x"], RES[0] - player.size["w"]))
+    player.loc["y"] = max(0, min(player.loc["y"], RES[1] - player.size["h"]))
 
-    draw_window()
+    draw_window(bg_image, player_image, player)
 
 pygame.quit()
