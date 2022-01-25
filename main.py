@@ -7,7 +7,7 @@ from collections import deque
 def get_init_variables():
     """Get the initial variables"""
     res = (900, 600)
-    player_size = dict(w=64, h=64)
+    player_size = dict(w=56, h=57)
 
     variables = dict(
         res=res,  # game window size
@@ -51,7 +51,7 @@ class Player:
         self.hitbox = self._get_hitbox()  # update hitbox
 
         win.blit(self.image, (self.loc["x"], self.loc["y"]))  # draw the character
-        pygame.draw.rect(win, (255, 255, 255), self.hitbox, 2)  # draw the hitbox
+        # pygame.draw.rect(win, (255, 255, 255), self.hitbox, 2)  # draw the hitbox
 
 
 class Enemy(Player):
@@ -115,8 +115,8 @@ def main_loop(
                 print("enemy created")
                 enemies.append(
                     Enemy(
-                        loc=dict(x=random.random() * (resolution[0] - 64), y=-54),
-                        size=dict(w=64, h=54),
+                        loc=dict(x=random.random() * (resolution[0] - 64), y=-38),
+                        size=dict(w=64, h=38),
                         image=enemy_image,
                     )
                 )
