@@ -14,6 +14,7 @@ def get_init_variables():
         player_loc=dict(
             x=(res[0] - player_size["w"]) // 2, y=res[1] + player_size["h"] + 5
         ),  # initial location of the player
+        bg_vel=2,  # velocity of background movement
     )
     return variables
 
@@ -35,6 +36,14 @@ class Player:
         win.blit(self.image, (self.loc["x"], self.loc["y"]))
 
 
+class Enemy(Player):
+    def __init__(self, loc, size, image) -> None:
+        super().__init__(loc, size, image)
+
+    def move(self):
+        pass
+
+
 def draw_window(bg_image, loc, resolution):
     win.blit(bg_image, (0, loc))
     win.blit(bg_image, (0, loc - resolution[1]))
@@ -45,6 +54,7 @@ def main_loop(
     win,
     clock,
     bg_image,
+    bg_vel,
     player_loc,
     player_size,
     player_image,
@@ -52,7 +62,7 @@ def main_loop(
     resolution,
 ):
     player = Player(loc=player_loc, size=player_size, image=player_image)
-    loc = 0
+    bg_loc = 0
     while run:
         clock.tick(fps)
 
@@ -75,10 +85,10 @@ def main_loop(
         player.loc["y"] = max(0, min(player.loc["y"], resolution[1] - player.size["h"]))
 
         # draw
-        loc += 2
-        if loc > resolution[1]:
-            loc = 0
-        draw_window(bg_image, loc, resolution)
+        bg_loc += bg_vel
+        if bg_loc > resolution[1]:
+            bg_loc = 0
+        draw_window(bg_image, bg_loc, resolution)
         player.draw(win)
         pygame.display.update()
 
@@ -98,6 +108,7 @@ if __name__ == "__main__":
         win=win,
         clock=clock,
         bg_image=bg_image,
+        bg_vel=var["bg_vel"],
         player_image=player_image,
         player_loc=var["player_loc"],
         player_size=var["player_size"],
