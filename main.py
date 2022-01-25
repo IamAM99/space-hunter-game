@@ -24,19 +24,22 @@ pygame.display.set_caption("AP Project")
 
 
 class Player:
-    def __init__(self, loc, size) -> None:
+    def __init__(self, loc, size, image) -> None:
         self.loc = loc
         self.size = size
         self.vel = 24
+        self.image = image
+
+    def draw(self, win):
+        win.blit(self.image, (player.loc["x"], player.loc["y"]))
+        pygame.display.update()
 
 
-def draw_window(bg_image, player_image, player: Player):
+def draw_window(bg_image):
     win.blit(bg_image, (0, 0))
-    win.blit(player_image, (player.loc["x"], player.loc["y"]))
-    pygame.display.update()
 
 
-player = Player(loc=PLAYER_LOC, size=PLAYER_SIZE)
+player = Player(loc=PLAYER_LOC, size=PLAYER_SIZE, image=player_image)
 run = True
 while run:
     clock.tick(FPS)
@@ -59,6 +62,8 @@ while run:
     player.loc["x"] = max(0, min(player.loc["x"], RES[0] - player.size["w"]))
     player.loc["y"] = max(0, min(player.loc["y"], RES[1] - player.size["h"]))
 
-    draw_window(bg_image, player_image, player)
+    # draw
+    draw_window(bg_image)
+    player.draw(win)
 
 pygame.quit()
