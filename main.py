@@ -34,9 +34,16 @@ class Player:
         self.size = size
         self.vel = 24
         self.image = image
+        self.hitbox = self._get_hitbox()  # (x, y, width, height)
+
+    def _get_hitbox(self):
+        return (self.loc["x"], self.loc["y"], self.size["w"], self.size["h"])
 
     def draw(self, win):
-        win.blit(self.image, (self.loc["x"], self.loc["y"]))
+        self.hitbox = self._get_hitbox()  # update hitbox
+
+        win.blit(self.image, (self.loc["x"], self.loc["y"]))  # draw the character
+        pygame.draw.rect(win, (255, 255, 255), self.hitbox, 2)  # draw the hitbox
 
 
 class Enemy(Player):
@@ -83,7 +90,7 @@ def main_loop(
                 print("enemy created")
                 enemies.append(
                     Enemy(
-                        loc=dict(x=random.random() * (resolution[0] - 64), y=0),
+                        loc=dict(x=random.random() * (resolution[0] - 64), y=-54),
                         size=dict(w=64, h=54),
                         image=enemy_image,
                     )
