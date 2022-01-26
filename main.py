@@ -207,6 +207,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("Space")
 
     pygame.init()
+    pygame.mixer.init()
 
     # music
     bullet_sound = pygame.mixer.Sound(os.path.join("assets", "bullet.mp3"))
