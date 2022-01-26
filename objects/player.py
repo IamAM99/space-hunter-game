@@ -33,15 +33,15 @@ class Player(BaseObject):
             min(self.loc["y"], self.res[1] - self.size["h"]),
         )
 
-    def shoot(self, bullets_right, bullets_left, bullet_image):
-        bullets_right.append(
+    def shoot(self, bullets, bullet_image):
+        bullets.append(
             Projectile(
                 player=self,
                 side="right",
                 image=bullet_image,
             )
         )
-        bullets_left.append(
+        bullets.append(
             Projectile(
                 player=self,
                 side="left",

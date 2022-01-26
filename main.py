@@ -1,7 +1,6 @@
 import os
 import random
 import pygame
-from collections import deque
 from objects.enemy import Enemy
 from objects.player import Player
 
@@ -43,10 +42,9 @@ def main_loop(
 ) -> None:
     bg_loc = 0  # initial y location of the background image
     player = Player(resolution=resolution, image=player_image)
-    enemies = deque()
     loop_cnt = 0  # count while loop iterations
-    bullets_left = []
-    bullets_right = []
+    enemies = []
+    bullets = []
 
     while run:
         clock.tick(fps)
@@ -68,13 +66,11 @@ def main_loop(
             loop_cnt = 0
 
         # move bullets and remove outside bullets
-        for bullet_r, bullet_l in zip(bullets_right, bullets_left):
-            if bullet_r.loc["y"] > -bullet_r.size["h"]:
-                bullet_r.move()
-                bullet_l.move()
+        for idx, bullet in enumerate(bullets):
+            if bullet.loc["y"] > -bullet.size["h"]:
+                bullet.move()
             else:
-                bullets_right.pop(bullets_right.index(bullet_r))
-                bullets_left.pop(bullets_left.index(bullet_l))
+                bullets.pop(idx)
 
         # check key pushes
         keys = pygame.key.get_pressed()
@@ -82,7 +78,7 @@ def main_loop(
 
         if keys[pygame.K_SPACE]:
             if loop_cnt % 10 < 2:
-                player.shoot(bullets_right, bullets_left, bullet_image)
+                player.shoot(bullets, bullet_image)
 
         ## draw the images
         # background
@@ -94,23 +90,25 @@ def main_loop(
         # enemies
         for enemy in list(enemies):
             if enemy.loc["y"] > resolution[1]:
-                enemies.popleft()
+                enemies.pop(0)
                 print("enemy out of screen")
                 continue
             enemy.draw(win)
             enemy.move()
 
-            # player collision
+            # player-enemy collision
             if player.collided(enemy):
                 print("player collided")
 
         # projectiles
-        for bullet_r, bullet_l in zip(bullets_right, bullets_left):
-            bullet_l.draw(win)
-            bullet_r.draw(win)
-            for enemy in enemies:
-                if bullet_l.collided(enemy) or bullet_r.collided(enemy):
-                    print("bullet collided")
+        for idx_b, bullet in enumerate(bullets):
+            bullet.draw(win)
+
+            # bullet-enemy collision
+            for idx_e, enemy in enumerate(enemies):
+                if bullet.collided(enemy):
+                    enemies.pop(idx_e)
+                    bullets.pop(idx_b)
 
         # player
         player.draw(win)
