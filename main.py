@@ -1,32 +1,8 @@
-import os
 import random
 import pygame
 from objects.enemy import Enemy
 from objects.player import Player
-
-
-def get_init_variables() -> dict:
-    """Get the initial variables"""
-    variables = dict(
-        res=(900, 600),  # game window size
-        fps=60,  # game frame rate
-        bg_vel=1,  # velocity of background movement
-    )
-    return variables
-
-
-def get_images() -> tuple:
-    bg_image = pygame.image.load(os.path.join("assets/img", "bg.png"))
-    player_image = pygame.image.load(os.path.join("assets/img", "player.png"))
-    enemy_image = pygame.image.load(os.path.join("assets/img", "enemy.png"))
-    bullet_image = pygame.image.load(os.path.join("assets/img", "bullet.png"))
-    return bg_image, player_image, enemy_image, bullet_image
-
-
-def get_sounds() -> tuple:
-    bullet_sound = pygame.mixer.Sound(os.path.join("assets/sound", "bullet.wav"))
-    music = pygame.mixer.music.load(os.path.join("assets/sound", "music.mp3"))
-    return bullet_sound, music
+from config import get_init_variables, get_game_init_vars, get_images, get_sounds
 
 
 def draw_window(bg_image: pygame.Surface, loc: float, resolution: tuple) -> None:
@@ -51,15 +27,11 @@ def main_loop(
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.3)
     bullet_sound.set_volume(0.7)
-    bg_loc = 0  # initial y location of the background image
-    player = Player(resolution=resolution, image=player_image)
-    loop_cnt = 0  # count while loop iterations
-    enemies = []
-    bullets = []
-    score = 0
-    game = True
     end_text_str = "Press space to try again!"
     end_text = font.render(end_text_str, 1, (220, 220, 220))
+    player = Player(resolution=resolution, image=player_image)
+    bg_loc, loop_cnt, enemies, bullets, score = get_game_init_vars()
+    game = True
 
     while run:
         clock.tick(fps)
@@ -150,11 +122,9 @@ def main_loop(
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 game = True
-                loop_cnt = 0  # count while loop iterations
-                enemies = []
-                bullets = []
-                score = 0
+                bg_loc, loop_cnt, enemies, bullets, score = get_game_init_vars()
 
+            # draw game over
             draw_window(bg_image, bg_loc, var["res"])
             pygame.draw.rect(
                 win,
@@ -223,6 +193,6 @@ if __name__ == "__main__":
         bullet_sound=bullet_sound,
         font=font,
     )
-    score, bg_loc = main_loop(**loop_kwargs)
+    main_loop(**loop_kwargs)
 
     pygame.quit()
