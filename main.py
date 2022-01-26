@@ -191,10 +191,6 @@ def main_loop(
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
     # initialize game
     pygame.init()
     pygame.mixer.init()
