@@ -27,7 +27,7 @@ def main_loop(
     font: pygame.font.SysFont,
 ) -> None:
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.3)
+    pygame.mixer.music.set_volume(0.5)
     bullet_sound.set_volume(0.7)
     end_text_str = "Press space to try again!"
     end_text = font.render(end_text_str, 1, (220, 220, 220))

@@ -23,14 +23,14 @@ def get_game_init_vars():
 
 
 def get_images() -> tuple:
-    bg_image = pygame.image.load(os.path.join("assets/img", "bg.png"))
-    player_image = pygame.image.load(os.path.join("assets/img", "player.png"))
-    enemy_image = pygame.image.load(os.path.join("assets/img", "enemy.png"))
-    bullet_image = pygame.image.load(os.path.join("assets/img", "bullet.png"))
+    bg_image = pygame.image.load(os.path.join("assets", "img", "bg.png"))
+    player_image = pygame.image.load(os.path.join("assets", "img", "player.png"))
+    enemy_image = pygame.image.load(os.path.join("assets", "img", "enemy.png"))
+    bullet_image = pygame.image.load(os.path.join("assets", "img", "bullet.png"))
     return bg_image, player_image, enemy_image, bullet_image
 
 
 def get_sounds() -> tuple:
-    bullet_sound = pygame.mixer.Sound(os.path.join("assets/sound", "bullet.wav"))
-    music = pygame.mixer.music.load(os.path.join("assets/sound", "music.mp3"))
+    bullet_sound = pygame.mixer.Sound(os.path.join("assets", "sound", "bullet.wav"))
+    music = pygame.mixer.music.load(os.path.join("assets", "sound", "music.mp3"))
     return bullet_sound, music
