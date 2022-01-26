@@ -46,7 +46,6 @@ def main_loop(
             # create a new enemy
             if loop_cnt == fps:  # try to add enemy every second
                 if random.getrandbits(1):
-                    print("enemy created")
                     enemies.append(
                         Enemy(
                             loc=dict(x=random.random() * (resolution[0] - 64), y=-38),
@@ -84,7 +83,6 @@ def main_loop(
                 if enemy.loc["y"] > resolution[1]:
                     enemies.pop(0)
                     score -= 1
-                    print("enemy out of screen")
                     continue
                 enemy.draw(win)
                 enemy.move()
