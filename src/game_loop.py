@@ -43,8 +43,14 @@ def main_loop(
                 run = False
 
         if game:
+            if loop_cnt == fps:
+                loop_cnt = 0
+
             # create a new enemy
-            if loop_cnt == fps:  # try to add enemy every second
+            rate_var = 0.2 * max(1, min(80, score))
+            if max(
+                0, min(1, -min(loop_cnt, rate_var) + rate_var)
+            ):  # try to add enemy every second
                 if random.getrandbits(1):
                     enemies.append(
                         Enemy(
@@ -52,7 +58,7 @@ def main_loop(
                             image=enemy_image,
                         )
                     )
-                loop_cnt = 0
+                # loop_cnt = 0
 
             # move bullets and remove outside bullets
             for idx, bullet in enumerate(bullets):
