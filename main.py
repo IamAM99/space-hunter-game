@@ -96,16 +96,21 @@ def main_loop(
             if enemy.loc["y"] > resolution[1]:
                 enemies.popleft()
                 print("enemy out of screen")
+                continue
             enemy.draw(win)
             enemy.move()
 
+            # player collision
             if player.collided(enemy):
-                print("collided")
+                print("player collided")
 
         # projectiles
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             bullet_l.draw(win)
             bullet_r.draw(win)
+            for enemy in enemies:
+                if bullet_l.collided(enemy) or bullet_r.collided(enemy):
+                    print("bullet collided")
 
         # player
         player.draw(win)
