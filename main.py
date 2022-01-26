@@ -4,10 +4,9 @@ import pygame
 from collections import deque
 from objects.enemy import Enemy
 from objects.player import Player
-from objects.projectile import Projectile
 
 
-def get_init_variables():
+def get_init_variables() -> dict:
     """Get the initial variables"""
     variables = dict(
         res=(900, 600),  # game window size
@@ -17,7 +16,7 @@ def get_init_variables():
     return variables
 
 
-def get_images():
+def get_images() -> tuple:
     bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
     player_image = pygame.image.load(os.path.join("assets", "player.png"))
     enemy_image = pygame.image.load(os.path.join("assets", "enemy.png"))
@@ -25,24 +24,24 @@ def get_images():
     return bg_image, player_image, enemy_image, bullet_image
 
 
-def draw_window(bg_image, loc, resolution):
+def draw_window(bg_image: pygame.Surface, loc: float, resolution: tuple) -> None:
     win.blit(bg_image, (0, loc))
     win.blit(bg_image, (0, loc - resolution[1]))
 
 
 def main_loop(
     run: bool,
-    win,
-    clock,
-    bg_image,
-    bg_vel,
-    player_image,
-    enemy_image,
-    bullet_image,
-    fps,
-    resolution,
-):
-    bg_loc = 0
+    win: pygame.Surface,
+    clock: pygame.time.Clock,
+    bg_image: pygame.Surface,
+    bg_vel: float,
+    player_image: pygame.Surface,
+    enemy_image: pygame.Surface,
+    bullet_image: pygame.Surface,
+    fps: int,
+    resolution: tuple,
+) -> None:
+    bg_loc = 0  # initial y location of the background image
     player = Player(resolution=resolution, image=player_image)
     enemies = deque()
     loop_cnt = 0  # count while loop iterations
@@ -68,6 +67,7 @@ def main_loop(
                 )
             loop_cnt = 0
 
+        # move bullets and remove outside bullets
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             if bullet_r.loc["y"] > -bullet_r.size["h"]:
                 bullet_r.move()
@@ -76,6 +76,7 @@ def main_loop(
                 bullets_right.pop(bullets_right.index(bullet_r))
                 bullets_left.pop(bullets_left.index(bullet_l))
 
+        # check key pushes
         keys = pygame.key.get_pressed()
         player.move(keys)
 
@@ -83,18 +84,14 @@ def main_loop(
             if loop_cnt % 10 < 2:
                 player.shoot(bullets_right, bullets_left, bullet_image)
 
-        player.loc["x"] = max(0, min(player.loc["x"], resolution[0] - player.size["w"]))
-        player.loc["y"] = max(
-            (resolution[1] - player.size["h"]) // 1.4,
-            min(player.loc["y"], resolution[1] - player.size["h"]),
-        )
-
-        # draw
+        ## draw the images
+        # background
         bg_loc += bg_vel
         if bg_loc > resolution[1]:
             bg_loc = 0
         draw_window(bg_image, bg_loc, resolution)
 
+        # enemies
         for enemy in list(enemies):
             if enemy.loc["y"] > resolution[1]:
                 enemies.popleft()
@@ -105,14 +102,18 @@ def main_loop(
             if player.collided(enemy):
                 print("collided")
 
+        # projectiles
         for bullet_r, bullet_l in zip(bullets_right, bullets_left):
             bullet_l.draw(win)
             bullet_r.draw(win)
 
+        # player
         player.draw(win)
 
+        # update the display
         pygame.display.update()
 
+        # update the loop counter
         loop_cnt += 1
 
 
