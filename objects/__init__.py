@@ -1,4 +1,3 @@
-from typing_extensions import Self
 import pygame
 
 
@@ -12,7 +11,7 @@ class BaseObject:
     def _get_hitbox(self) -> tuple:
         return (self.loc["x"], self.loc["y"], self.size["w"], self.size["h"])
 
-    def collided(self, other: Self) -> bool:
+    def collided(self, other) -> bool:
         x1, y1, w1, h1 = self.hitbox
         x2, y2, w2, h2 = other.hitbox
         if (x1 < x2 + w2) and (x1 + w1 > x2) and (y1 < y2 + h2) and (y1 + h1 > y2):
