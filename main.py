@@ -16,11 +16,18 @@ def get_init_variables() -> dict:
 
 
 def get_images() -> tuple:
-    bg_image = pygame.image.load(os.path.join("assets", "bg.png"))
-    player_image = pygame.image.load(os.path.join("assets", "player.png"))
-    enemy_image = pygame.image.load(os.path.join("assets", "enemy.png"))
-    bullet_image = pygame.image.load(os.path.join("assets", "bullet.png"))
+    bg_image = pygame.image.load(os.path.join("assets/img", "bg.png"))
+    player_image = pygame.image.load(os.path.join("assets/img", "player.png"))
+    enemy_image = pygame.image.load(os.path.join("assets/img", "enemy.png"))
+    bullet_image = pygame.image.load(os.path.join("assets/img", "bullet.png"))
     return bg_image, player_image, enemy_image, bullet_image
+
+
+def get_sounds() -> tuple:
+    bullet_sound = pygame.mixer.Sound(os.path.join("assets/sound", "bullet.wav"))
+    hit_sound = pygame.mixer.Sound(os.path.join("assets/sound", "hit.mp3"))
+    music = pygame.mixer.music.load(os.path.join("assets/sound", "music.mp3"))
+    return bullet_sound, hit_sound, music
 
 
 def draw_window(bg_image: pygame.Surface, loc: float, resolution: tuple) -> None:
@@ -41,6 +48,7 @@ def main_loop(
     resolution: tuple,
     bullet_sound,
 ) -> None:
+    pygame.mixer.music.play(-1)
     font = pygame.font.SysFont("comicsans", 30, True)
     bg_loc = 0  # initial y location of the background image
     player = Player(resolution=resolution, image=player_image)
@@ -80,8 +88,9 @@ def main_loop(
         player.move(keys)
 
         if keys[pygame.K_SPACE]:
-            if loop_cnt % 10 < 2:
+            if loop_cnt % 10 < 1:
                 bullet_sound.play()
+            if loop_cnt % 10 < 2:
                 player.shoot(bullets, bullet_image)
 
         ## draw the images
@@ -95,6 +104,7 @@ def main_loop(
         for enemy in list(enemies):
             if enemy.loc["y"] > resolution[1]:
                 enemies.pop(0)
+                score -= 1
                 print("enemy out of screen")
                 continue
             enemy.draw(win)
@@ -102,10 +112,7 @@ def main_loop(
 
             # player-enemy collision
             if player.collided(enemy):
-                score += 1
                 print("player collided")
-        text = font.render("Score: " + str(score), 1, (8, 227, 14))
-        win.blit(text, (10, 10))
 
         # projectiles
         for idx_b, bullet in enumerate(bullets):
@@ -114,11 +121,15 @@ def main_loop(
             # bullet-enemy collision
             for idx_e, enemy in enumerate(enemies):
                 if bullet.collided(enemy):
+                    score += 2
                     enemies.pop(idx_e)
                     bullets.pop(idx_b)
 
         # player
         player.draw(win)
+
+        text = font.render("Score: " + str(score), 1, (220, 220, 220))
+        win.blit(text, (9, 0))
 
         # update the display
         pygame.display.update()
@@ -128,23 +139,23 @@ def main_loop(
 
 
 if __name__ == "__main__":
-    var = get_init_variables()
-    clock = pygame.time.Clock()
-
-    bg_image, player_image, enemy_image, bullet_image = get_images()
-
-    win = pygame.display.set_mode(var["res"])
-    pygame.display.set_caption("Space")
-
+    # initialize game
     pygame.init()
     pygame.mixer.init()
+    clock = pygame.time.Clock()
 
-    # music
-    bullet_sound = pygame.mixer.Sound(os.path.join("assets", "bullet.mp3"))
-    hit_sound = pygame.mixer.Sound(os.path.join("assets", "hit.mp3"))
-    music = pygame.mixer.music.load(os.path.join("assets", "music.mp3"))
-    pygame.mixer.music.play(-1)
+    # get config variables
+    var = get_init_variables()
 
+    # load assets
+    bg_image, player_image, enemy_image, bullet_image = get_images()
+    bullet_sound, hit_sound, music = get_sounds()
+
+    # create game window
+    win = pygame.display.set_mode(var["res"])
+    pygame.display.set_caption("Space Hunter")
+
+    # game main loop
     main_loop(
         run=True,
         win=win,
