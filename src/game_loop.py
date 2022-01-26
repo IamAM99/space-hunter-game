@@ -160,7 +160,7 @@ def main_loop(
         pygame.display.update()
 
 
-def run_game() -> None:
+def open_game_window() -> None:
     # initialize game
     pygame.init()
     pygame.mixer.init()

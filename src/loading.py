@@ -3,7 +3,7 @@ from PySide2 import QtCore
 from PySide2.QtGui import QColor
 from PySide2.QtWidgets import QMainWindow, QGraphicsDropShadowEffect, QApplication
 from src.loading_setup import Ui_SplashScreen
-from src.game_loop import run_game
+from src.game_loop import open_game_window
 
 
 class SplashScreen(QMainWindow):
@@ -69,15 +69,15 @@ class SplashScreen(QMainWindow):
             self.timer.stop()
             # CLOSE SPLASH SCREEN
             self.close()
-            run_game()
+            open_game_window()
         self.counter += 1
 
 
-def run_loading():
+def start_game():
     app = QApplication(sys.argv)
     window = SplashScreen()
     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
-    run_loading()
+    start_game()
