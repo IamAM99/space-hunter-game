@@ -1,8 +1,10 @@
 import os
+import sys
 import random
 import pygame
 from objects.enemy import Enemy
 from objects.player import Player
+from objects.loading import run_loading
 
 
 def get_init_variables() -> dict:
@@ -139,6 +141,10 @@ def main_loop(
 
 
 if __name__ == "__main__":
+
+    # loading
+    app = run_loading()
+
     # initialize game
     pygame.init()
     pygame.mixer.init()
@@ -170,3 +176,4 @@ if __name__ == "__main__":
         bullet_sound=bullet_sound,
     )
     pygame.quit()
+    sys.exit(app.exec_())
