@@ -5,7 +5,7 @@ from PySide2.QtCore import (
     Qt,
 )
 from PySide2.QtGui import QFont
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QFrame, QLabel, QProgressBar
 
 
 class Ui_SplashScreen(object):
@@ -106,7 +106,7 @@ class Ui_SplashScreen(object):
         )
         self.label_description.setText(
             QCoreApplication.translate(
-                "SplashScreen", u"<strong>APP</strong> DESCRIPTION", None
+                "SplashScreen", u"<strong>WELCOME</strong> TO OUR GAME", None
             )
         )
         self.label_loading.setText(

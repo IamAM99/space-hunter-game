@@ -1,5 +1,5 @@
-from src.game_loop import run_game
+from src.loading import run_loading
 
 
 if __name__ == "__main__":
-    run_game()
+    run_loading()

@@ -1,13 +1,9 @@
 import sys
 from PySide2 import QtCore
 from PySide2.QtGui import QColor
-from PySide2.QtWidgets import *
-
-# ==> SPLASH SCREEN
-from objects.loading_setup import Ui_SplashScreen
-
-# ==> GLOBALS
-counter = 0
+from PySide2.QtWidgets import QMainWindow, QGraphicsDropShadowEffect, QApplication
+from src.loading_setup import Ui_SplashScreen
+from src.game_loop import run_game
 
 
 class SplashScreen(QMainWindow):
@@ -15,6 +11,9 @@ class SplashScreen(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_SplashScreen()
         self.ui.setupUi(self)
+
+        # Counter
+        self.counter = 0
 
         # REMOVE TITLE BAR
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
@@ -32,48 +31,52 @@ class SplashScreen(QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.progress)
         # TIMER IN MILLISECONDS
-        self.timer.start(50)
+        self.timer.start(40)
 
         # CHANGE DESCRIPTION
 
         # Initial Text
-        self.ui.label_description.setText("<strong>WELCOME</strong> TO OUR GAME")
+        QtCore.QTimer.singleShot(
+            2500,
+            lambda: self.ui.label_description.setText(
+                "<strong>WELCOME</strong> TO OUR GAME"
+            ),
+        )
 
         # Change Texts
         QtCore.QTimer.singleShot(
-            1500,
+            3500,
             lambda: self.ui.label_description.setText(
-                "<strong>LOADING</strong> DATABASE"
+                "<strong>LOADING</strong> THE STARSHIP"
             ),
         )
         QtCore.QTimer.singleShot(
-            3000,
+            5000,
             lambda: self.ui.label_description.setText(
-                "<strong>LOADING</strong> USER INTERFACE"
+                "<strong>SPAWNING</strong> ENEMIES"
             ),
         )
         self.show()
 
     def progress(self):
 
-        global counter
         # SET VALUE TO PROGRESS BAR
-        self.ui.progressBar.setValue(counter)
+        self.ui.progressBar.setValue(self.counter)
 
         # CLOSE SPLASH SCREE AND OPEN APP
-        if counter > 100:
+        if self.counter > 100:
             # STOP TIMER
             self.timer.stop()
             # CLOSE SPLASH SCREEN
             self.close()
-        counter += 1
+            run_game()
+        self.counter += 1
 
 
 def run_loading():
     app = QApplication(sys.argv)
     window = SplashScreen()
-    # sys.exit(app.exec_())
-    return app
+    sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
