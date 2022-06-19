@@ -62,7 +62,7 @@ python3 main.py
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/HRSK2000">
+      <a href="https://github.com/o-OHamiD">
         <img src="https://avatars.githubusercontent.com/u/87880922?v=4" width="100px;" alt="Hamireza Safari"/><br>
         <sub>
           <b>Hamireza Safari</b>
